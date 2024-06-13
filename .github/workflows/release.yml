@@ -1,0 +1,37 @@
+name: Release flow
+
+on:
+  push:
+    branches: ["release"]
+
+env:
+  RELEASE_REGISTRY: ${{ vars.DOCKER_REGISTRY_URL }}/annotation-tool
+  IMAGE: ohif-viewer
+  TAG: ${{ github.run_number }}
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    name: Build release image and push to Docker Registry
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the OVH registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.RELEASE_REGISTRY }}
+          username: ${{ vars.DOCKER_REGISTRY_USER }}
+          password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          tags: |
+            ${{ env.RELEASE_REGISTRY }}/${{ env.IMAGE }}:${{ env.TAG }}
+            ${{ env.RELEASE_REGISTRY }}/${{ env.IMAGE }}:latest
+          push: true
