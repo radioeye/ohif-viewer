@@ -44,6 +44,9 @@ WORKDIR /usr/src/app
 
 COPY --from=json-copier /usr/src/app .
 
+# From https://github.com/nodejs/docker-node/issues/1335
+RUN yarn config set network-timeout 300000
+
 # Run the install before copying the rest of the files
 RUN yarn config set workspaces-experimental true
 RUN yarn install --frozen-lockfile --verbose

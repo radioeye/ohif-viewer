@@ -27,10 +27,17 @@ jobs:
           username: ${{ vars.DOCKER_REGISTRY_USER }}
           password: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
+          platforms: linux/amd64,linux/arm64
           tags: |
             ${{ env.RELEASE_REGISTRY }}/${{ env.IMAGE }}:${{ env.TAG }}
             ${{ env.RELEASE_REGISTRY }}/${{ env.IMAGE }}:latest
